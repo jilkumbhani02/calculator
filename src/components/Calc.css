@@ -64,3 +64,8 @@ body {
   background-color: #f44336;
   color: white;
 }
+
+.his:hover {
+  transform: scale(1.1);
+  transition: 0.5s;
+}

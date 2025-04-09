@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaBackspace } from "react-icons/fa";
-
+import { MdEdit } from "react-icons/md";
 import "./Calc.css";
 
 const Calculator = () => {
@@ -8,7 +8,7 @@ const Calculator = () => {
   const [history, setHistory] = useState("");
 
   // console.log(data);
-  //   console.log(history);
+//   console.log(history);
 
   const getValue = (event) => {
     setData(data.concat(event.target.value));
@@ -20,8 +20,10 @@ const Calculator = () => {
     setData("");
   };
   const calculate = () => {
-    setHistory([...history, data]);
-    setData(eval(data).toString());
+    if (data !== "") {
+      setHistory([...history, data]);
+      setData(eval(data).toString());
+    }
   };
 
   const add = (calc) => {
@@ -97,14 +99,31 @@ const Calculator = () => {
         </div>
       </div>
       <div>
-        {history &&
-          history.map((item) => {
+        <h2 className="text-center" style={{ color: "grey" }}>
+          History
+        </h2>
+        <hr />
+        {history.length === 0 ? (
+          <h3>No Records</h3>
+        ) : (
+          history.map((item, index) => {
             return (
-              <h1 style={{ cursor: "pointer" }} onClick={() => add(item)}>
+              <h3 className="his" key={index}>
+                <MdEdit
+                  onClick={() => add(item)}
+                  style={{
+                    fontSize: "22px",
+                    cursor: "pointer",
+                    marginRight: "20px",
+                    border: "1px solid black",
+                  }}
+                />
                 {item} = {eval(item).toString()}
-              </h1>
+                <hr />
+              </h3>
             );
-          })}
+          })
+        )}
       </div>
     </div>
   );
