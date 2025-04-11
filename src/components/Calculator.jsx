@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaBackspace } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import "./Calc.css";
@@ -8,21 +8,69 @@ const Calculator = () => {
   const [history, setHistory] = useState("");
 
   // console.log(data);
-//   console.log(history);
+  // console.log(history);
 
-  const getValue = (event) => {
-    setData(data.concat(event.target.value));
+  const operators = ["+", "-", "*", "/", "%"];
+
+  const handleKeyDown = (e) => {
+    const key = e.key;
+    if (key === "Backspace") {
+      handleBack();
+    } else if (key === "Enter") {
+      calculate();
+    } else if (key === "Escape") {
+      handleClear();
+    } else if (/^[0-9]$/.test(key)) {
+      getValueByKey(key);
+    } else if (operators.includes(key)) {
+      setData((prev) => {
+        const lastChar = prev.slice(-1);
+        if (operators.includes(lastChar)) {
+          return prev.slice(0, -1) + key;
+        } else {
+          return prev + key;
+        }
+      });
+    }
   };
+
+  const getValue = (e) => {
+    let input = e.target.value;
+
+    if (operators.includes(input)) {
+      setData((prev) => {
+        const lastChar = prev.slice(-1);
+        if (operators.includes(lastChar)) {
+          return prev.slice(0, -1) + input;
+        } else {
+          return prev + input;
+        }
+      });
+    } else {
+      setData(data.concat(input));
+    }
+  };
+
+  const getValueByKey = (key) => {
+    setData((prevInput) => prevInput + key);
+  };
+
   const handleBack = () => {
     setData(data.slice(0, -1));
   };
+
   const handleClear = () => {
     setData("");
   };
+
   const calculate = () => {
-    if (data !== "") {
-      setHistory([...history, data]);
-      setData(eval(data).toString());
+    try {
+      if (data !== "") {
+        setData(eval(data).toString());
+        setHistory([...history, data]);
+      }
+    } catch (err) {
+      setData("error");
     }
   };
 
@@ -30,6 +78,13 @@ const Calculator = () => {
     setData(calc);
     setHistory(history.filter((item) => item !== calc));
   };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [data]);
 
   return (
     <div className="calc d-flex gap-5">
@@ -84,10 +139,7 @@ const Calculator = () => {
           <button value="+" onClick={getValue}>
             +
           </button>
-          <button value="00" onClick={getValue}>
-            00
-          </button>
-          <button value="0" onClick={getValue}>
+          <button value="0" className="double" onClick={getValue}>
             0
           </button>
           <button value="." onClick={getValue}>
